@@ -1,0 +1,4 @@
+KAPDFPLugin
+===========
+
+Corodova PDF Plugin
