@@ -19,20 +19,30 @@
 
 - (void)generatePDF:(CDVInvokedUrlCommand*)command
 {
+    webViewHeight = [[self.webView stringByEvaluatingJavaScriptFromString:@"document.body.scrollHeight;"]
+                     integerValue];
+
     [self.commandDelegate runInBackground:^{
-        if ([self createPDFromCurrentWebView]) {
-            
-        }
+       [self createPDFromCurrentWebView:^(NSString *filePath) {
+           CDVPluginResult *result=[CDVPluginResult resultWithStatus:CDVCommandStatus_OK
+                                                     messageAsString:filePath];
+           [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+           
+       } failureBlock:^(BOOL status) {
+           CDVPluginResult *result=[CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR];
+           [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+           
+       }];
     }];
 }
 
 
 #pragma mark - PDF 
 
-- (BOOL)createPDFromCurrentWebView
+- (void)createPDFromCurrentWebView:(void(^)(NSString* filePath))succes
+    failureBlock:(void(^)(BOOL status))failed
 {
-    webViewHeight = [[self.webView stringByEvaluatingJavaScriptFromString:@"document.body.scrollHeight;"]
-                     integerValue];
+    
     CGRect screenRect = self.webView.frame;
     double currentWebViewHeight = webViewHeight;
     while (currentWebViewHeight > 0)
@@ -64,18 +74,19 @@
         
         NSString *scrollJS=[NSString stringWithFormat:@"window.scrollBy(0,%f);",viewHeight];
         if (!result) {
-            return result;
+            failed(result);
         }
         
         [self.webView performSelectorOnMainThread:@selector(stringByEvaluatingJavaScriptFromString:)
                                        withObject:scrollJS waitUntilDone:YES];
         currentWebViewHeight -= viewHeight;
     }
-    [self drawPdf];
-    return YES;
+    
+    succes([self drawPdf]);
+
 }
 
-- (void) drawPdf
+- (NSString*) drawPdf
 {
     CGSize pageSize = CGSizeMake(PDFWIDTH, webViewHeight);
     NSString *fileName = @"Demo.pdf";
@@ -91,7 +102,6 @@
     for (int index = 1; index  <= imageName ; index++)
     {
         NSString *pngPath = [NSTemporaryDirectory() stringByAppendingPathComponent:[NSString stringWithFormat:@"%d.png", index]];
-        NSLog(@"%@",pngPath);
         UIImage *pngImage = [UIImage imageWithContentsOfFile:pngPath];
         
         [pngImage drawInRect:CGRectMake(0, currentHeight, pageSize.width, pngImage.size.height)];
@@ -99,6 +109,8 @@
     }
     
     UIGraphicsEndPDFContext();
+    
+    return pdfFileName;
 }
 
 @end
