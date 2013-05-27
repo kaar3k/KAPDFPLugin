@@ -26,17 +26,22 @@
         <title>Hello World</title>
     </head>
     <body>
-        <div class="app">
-<button type="button" onclick="kar()" value="ddd" >generatePDF</button>
+        <div class="app">   
+<button type="button" onclick="createPDF()" value="ddd" >generatePDF</button>
         </div>
         <script type="text/javascript" src="cordova-2.7.0.js"></script>
         <script type="text/javascript" src="js/index.js"></script>
         <script type="text/javascript">
             app.initialize();
-            function kar(){
-                cordova.exec(alert('d'), alert('o'), "PDFGenerator","generatePDF" , [1]);
+            function createPDF(){
+                cordova.exec(success, failure, "PDFGenerator","generatePDF" , [1]);
             }
-            
+            function success(filePath){
+                alert(filePath);
+            }
+            function failure(filePath){
+                alert('Failed');
+            }
                    
         </script>
     </body>
