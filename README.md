@@ -1,4 +1,4 @@
-KAPDFPLugin for corodova
+KAPDFPLugin for corodova ios
 =============
 
 
