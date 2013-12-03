@@ -14,3 +14,7 @@ See [this][1] link for details how to add Corodova plugin to your project.
 
 
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/kaar3k/kapdfplugin/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
